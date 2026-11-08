@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ProfitPilot AI — منصة إدارة وتتبع أرباح التجارة الإلكترونية والدفع عند الاستلام</title>
+    <!-- Google Fonts: Cairo for Arabic, Inter for English -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Favicon Brand Logo -->
+    <link rel="icon" type="image/svg+xml" href="assets/logo-icon.svg">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <div id="app" class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-icon svg-brand">
+                    <img src="assets/logo-icon.svg" alt="ProfitPilot AI Logo" class="brand-logo-img">
+                </div>
+                <div class="brand-text">
+                    <h2>ProfitPilot <span>AI</span></h2>
+                    <p class="tagline" data-i18n="tagline">افهم أرقامك. ضاعف أرباحك.</p>
+                </div>
+                <button class="close-sidebar-btn" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#dashboard" class="nav-item active" onclick="switchTab('dashboard')">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span data-i18n="nav_dashboard">لوحة التحكم والأرباح</span>
+                </a>
+                <a href="#orders" class="nav-item" onclick="switchTab('orders')">
+                    <i class="fa-solid fa-truck-ramp-box"></i>
+                    <span data-i18n="nav_orders">الطلبات وإدارة COD</span>
+                </a>
+                <a href="#products" class="nav-item" onclick="switchTab('products')">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                    <span data-i18n="nav_products">المنتجات وهامش الربح</span>
+                </a>
+                <a href="#reconciliation" class="nav-item" onclick="switchTab('reconciliation')">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                    <span data-i18n="nav_reconciliation">تسوية شركات الشحن</span>
+                </a>
+                <a href="#marketing" class="nav-item" onclick="switchTab('marketing')">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    <span data-i18n="nav_marketing">الإعلانات و ROAS الحقيقي</span>
+                </a>
+                <a href="#inventory" class="nav-item" onclick="switchTab('inventory')">
+                    <i class="fa-solid fa-warehouse"></i>
+                    <span data-i18n="nav_inventory">المخزون والتقييم</span>
+                </a>
+                <a href="#ai-assistant" class="nav-item" onclick="switchTab('ai-assistant')">
+                    <i class="fa-solid fa-robot"></i>
+                    <span data-i18n="nav_ai">المساعد المالي الذكي</span>
+                    <span class="badge ai-badge">AI</span>
+                </a>
+                <a href="#catalog-ai" class="nav-item" onclick="switchTab('catalog-ai')">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span data-i18n="nav_catalog_ai">كاتب محتوى المنتجات</span>
+                </a>
+                <a href="#integrations" class="nav-item" onclick="switchTab('integrations')">
+                    <i class="fa-solid fa-plug-circle-bolt"></i>
+                    <span data-i18n="nav_integrations">الربط مع المتاجر (WooCommerce & Shopify)</span>
+                    <span class="badge" style="background:#10b981; color:#fff; font-size:0.65rem;" data-i18n="badge_new">جديد</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-demo" onclick="seedDemoData()">
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                    <span data-i18n="load_demo">تحميل متجر تجريبي (المغرب)</span>
+                </button>
+                <div class="system-status">
+                    <span class="status-indicator online"></span>
+                    <span data-i18n="system_status">النظام متصل: محرك الحسابات جاهز</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Topbar Header -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                    <div class="store-selector">
+                        <i class="fa-solid fa-store store-icon"></i>
+                        <span id="current-store-name" class="store-title">متجر الأطلس للتجارة</span>
+                        <!-- Currency Selector Dropdown -->
+                        <div class="currency-dropdown">
+                            <select id="currency-select" onchange="changeCurrency(this.value)">
+                                <option value="MAD" selected>MAD (درهم)</option>
+                                <option value="SAR">SAR (ريال)</option>
+                                <option value="USD">USD ($)</option>
+                                <option value="EUR">EUR (€)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <!-- Language Switcher -->
+                    <div class="lang-switch">
+                        <button class="lang-btn active" onclick="setLanguage('ar')">عربي</button>
+                        <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+                        <button class="lang-btn" onclick="setLanguage('fr')">FR</button>
+                    </div>
+
+                    <!-- Theme Toggle -->
+                    <button class="icon-btn" onclick="toggleTheme()" title="تبديل النمط">
+                        <i class="fa-solid fa-moon" id="theme-icon"></i>
+                    </button>
+
+                    <div class="user-pill" onclick="openProfileSettingsModal()" title="إعدادات الحساب والمتجر (Edit Profile)">
+                        <i class="fa-solid fa-circle-user"></i>
+                        <span id="user-display-name">كريم العلمي</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Notification Alerts Banner -->
+            <div id="alerts-container" class="alerts-container"></div>
+
+            <!-- Tab 1: Dashboard Overview -->
+            <section id="tab-dashboard" class="content-tab active">
+                <div class="section-header">
+                    <div>
+                        <h1 data-i18n="dash_title">ملخص الأرباح والسيولة النقدية</h1>
+                        <p class="subtitle" data-i18n="dash_subtitle">حسابات مالية قطعية دقيقة غير قائمة على التخمين</p>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-secondary" onclick="exportOrders()"><i class="fa-solid fa-file-csv"></i> <span data-i18n="export_csv">تصدير CSV</span></button>
+                        <button class="btn btn-primary" onclick="loadDashboard()"><i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="refresh">تحديث الأرقام</span></button>
+                    </div>
+                </div>
+
+                <!-- KPI Cards Grid -->
+                <div class="kpi-grid">
+                    <div class="kpi-card profit-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-label" data-i18n="kpi_net_profit">صافي الربح الحقيقي</span>
+                            <h2 id="kpi-net-profit">+434.00 <span class="curr">MAD</span></h2>
+                            <span class="kpi-sub" id="kpi-margin-sub">هامش الربح: 14.3% (بعد خصم الشحن والإعلانات)</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon blue"><i class="fa-solid fa-cash-register"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-label" data-i18n="kpi_delivered_rev">المبيعات المستلمة (Delivered)</span>
+                            <h2 id="kpi-delivered-revenue">3,035.00 <span class="curr">MAD</span></h2>
+                            <span class="kpi-sub" id="kpi-success-rate">نسبة التوصيل: 86.7% (13 طلب مسلم)</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card warning-card">
+                        <div class="kpi-icon red"><i class="fa-solid fa-rotate-left"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-label" data-i18n="kpi_return_losses">خسائر المرتجعات (RTO Losses)</span>
+                            <h2 id="kpi-return-losses">42.00 <span class="curr">MAD</span></h2>
+                            <span class="kpi-sub" id="kpi-return-rate">نسبة الإرجاع: 13.3% (2 مرتجع)</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon purple"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-label" data-i18n="kpi_carrier_cod">أموال COD معلقة لدى شركات التوصيل</span>
+                            <h2 id="kpi-carrier-cod">2,438.00 <span class="curr">MAD</span></h2>
+                            <span class="kpi-sub" data-i18n="carrier_holding">أموال محصلة قيد التحويل البنكي</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon orange"><i class="fa-solid fa-bullseye"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-label" data-i18n="kpi_ad_spend">مصاريف الإعلانات (Meta + TikTok)</span>
+                            <h2 id="kpi-ad-spend">470.00 <span class="curr">MAD</span></h2>
+                            <span class="kpi-sub" id="kpi-roas">العائد ROAS الحقيقي: 6.4x</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon green"><i class="fa-solid fa-boxes-packing"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-label" data-i18n="kpi_inventory_val">قيمة البضاعة في المستودع</span>
+                            <h2 id="kpi-inventory-val">9,349.00 <span class="curr">MAD</span></h2>
+                            <span class="kpi-sub" data-i18n="cost_valuation">مقيّمة بسعر الشراء من المورد</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3><i class="fa-solid fa-chart-area"></i> <span data-i18n="chart_revenue_profit">المبيعات المستلمة مقابل صافي الأرباح</span></h3>
+                        <div class="chart-wrapper"><canvas id="revenueProfitChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3><i class="fa-solid fa-chart-pie"></i> <span data-i18n="chart_orders_distribution">توزيع حالات الطلبيات</span></h3>
+                        <div class="chart-wrapper"><canvas id="orderStatusChart"></canvas></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 2: Orders & COD Management -->
+            <section id="tab-orders" class="content-tab">
+                <div class="section-header">
+                    <div>
+                        <h1 data-i18n="orders_title">إدارة الطلبات والتحصيل (Orders & COD)</h1>
+                        <p class="subtitle" data-i18n="orders_subtitle">تتبع حالات التوصيل، مصاريف الشحن، وأرباح كل طلب</p>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-primary" onclick="openNewOrderModal()"><i class="fa-solid fa-circle-plus"></i> <span data-i18n="add_order">إضافة طلب جديد</span></button>
+                    </div>
+                </div>
+
+                <!-- Orders Filter Bar -->
+                <div class="filter-bar">
+                    <input type="text" id="order-search-input" data-i18n-ph="search_orders_ph" placeholder="بحث برقم الطلب، هاتف العميل، أو رقم التتبع..." oninput="filterOrders()">
+                    <select id="order-status-filter" onchange="filterOrders()">
+                        <option value="" data-i18n="opt_all_status">جميع الحالات (All)</option>
+                        <option value="delivered" data-i18n="opt_delivered">مستلم (Delivered)</option>
+                        <option value="shipped" data-i18n="opt_shipped">قيد التوصيل (Shipped)</option>
+                        <option value="confirmed" data-i18n="opt_confirmed">مؤكد (Confirmed)</option>
+                        <option value="returned" data-i18n="opt_returned">مرتجع (Returned)</option>
+                        <option value="cancelled" data-i18n="opt_cancelled">ملغي (Cancelled)</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="orders-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="th_order_num">رقم الطلب</th>
+                                <th data-i18n="th_customer_city">العميل والمدينة</th>
+                                <th data-i18n="th_carrier">شركة الشحن</th>
+                                <th data-i18n="th_amount_cod">المبلغ (COD)</th>
+                                <th data-i18n="th_shipping_cost">تكلفة الشحن والتغليف</th>
+                                <th data-i18n="th_status">حالة الطلب</th>
+                                <th data-i18n="th_net_profit">صافي الربح / الخسارة</th>
+                                <th data-i18n="th_actions">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tab 3: Products & Catalog -->
+            <section id="tab-products" class="content-tab">
+                <div class="section-header">
+                    <div>
+                        <h1 data-i18n="products_title">كتالوج المنتجات ومحاكي الربحية</h1>
+                        <p class="subtitle" data-i18n="products_subtitle">حساب الهامش الحقيقي بعد احتساب مخاطر الروتور ونسبة التعادل</p>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-secondary" onclick="downloadProductTemplate()"><i class="fa-solid fa-file-arrow-down"></i> <span data-i18n="btn_download_csv_template">نموذج استيراد CSV</span></button>
+                        <button class="btn btn-secondary" onclick="document.getElementById('product-csv-file').click()"><i class="fa-solid fa-file-arrow-up"></i> <span data-i18n="btn_upload_csv">استيراد CSV</span></button>
+                        <input type="file" id="product-csv-file" accept=".csv" style="display:none;" onchange="uploadProductCSV(event)">
+                        <button class="btn btn-primary" onclick="openModal('modal-new-product')"><i class="fa-solid fa-plus"></i> <span data-i18n="btn_add_product">إضافة منتج جديد</span></button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="products-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="th_prod_sku">المنتج و SKU</th>
+                                <th data-i18n="th_purchase_cost">سعر الشراء</th>
+                                <th data-i18n="th_selling_price">سعر البيع</th>
+                                <th data-i18n="th_nominal_margin">هامش الربح الاسمي</th>
+                                <th data-i18n="th_stock_qty">المخزون المتوفر</th>
+                                <th data-i18n="th_stock_status">الحالة</th>
+                                <th data-i18n="th_profit_breakdown">تحليل الربحية التفصيلي</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tab 4: Delivery & COD Reconciliation -->
+            <section id="tab-reconciliation" class="content-tab">
+                <div class="section-header">
+                    <div>
+                        <h1 data-i18n="reconcile_title">تسوية ومطابقة أموال شركات الشحن (COD Audit)</h1>
+                        <p class="subtitle" data-i18n="reconcile_subtitle">كشف أي فروقات واقتطاعات غير مبررة بين المبالغ المتوقعة والتحويل البنكي</p>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-secondary" onclick="openCityRatesModal()"><i class="fa-solid fa-map-location-dot"></i> <span data-i18n="btn_edit_city_rates">تعديل أسعار التوصيل حسب المدن</span></button>
+                    </div>
+                </div>
+
+                <div class="carriers-grid" id="carriers-grid">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+
+            <!-- Tab 5: Marketing & ROAS -->
+            <section id="tab-marketing" class="content-tab">
+                <div class="section-header">
+                    <div>
+                        <h1 data-i18n="marketing_title">تحليل الحملات الإعلانية و ROAS الحقيقي</h1>
+                        <p class="subtitle" data-i18n="marketing_subtitle">الربط بين مصاريف Meta و TikTok والمبيعات المستلمة فعلياً</p>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-primary" onclick="openAddSpendModal()"><i class="fa-solid fa-plus"></i> <span data-i18n="btn_add_ad_spend">إضافة مصاريف إعلانية</span></button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="marketing-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="th_platform">المنصة</th>
+                                <th data-i18n="th_campaign_name">اسم الحملة</th>
+                                <th data-i18n="th_ad_spend">الإنفاق الإعلاني</th>
+                                <th data-i18n="th_attributed_orders">الطلبات المنسوبة</th>
+                                <th data-i18n="th_cpa">تكلفة الاستحواذ (CPA)</th>
+                                <th data-i18n="th_roas">العائد على الإنفاق (ROAS)</th>
+                                <th data-i18n="th_status">الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marketing-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tab 6: Inventory -->
+            <section id="tab-inventory" class="content-tab">
+                <div class="section-header">
+                    <div>
+                        <h1 data-i18n="inventory_title">المخزون وتقييم رأس المال</h1>
+                        <p class="subtitle" data-i18n="inventory_subtitle">كشف المنتجات الراكدة (Dead Stock) وتنبيهات النفاد</p>
+                    </div>
+                </div>
+
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-data">
+                            <span class="kpi-label" data-i18n="kpi_inv_total_units">إجمالي القطع في المستودع</span>
+                            <h2 id="inv-total-units">203 قطعة</h2>
+                        </div>
+                    </div>
+                    <div class="kpi-card warning-card">
+                        <div class="kpi-data">
+                            <span class="kpi-label" data-i18n="kpi_inv_low_stock">منتجات على وشك النفاد (Low Stock)</span>
+                            <h2 id="inv-low-stock">1 منتج</h2>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-data">
+                            <span class="kpi-label" data-i18n="kpi_inv_dead_stock">منتجات راكدة (Dead Stock)</span>
+                            <h2 id="inv-dead-stock">1 منتج</h2>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 7: AI Business Analyst -->
+            <section id="tab-ai-assistant" class="content-tab">
+                <div class="section-header">
+                    <div>
+                        <h1 data-i18n="ai_analyst_title">المساعد المالي الذكي (ProfitPilot Copilot)</h1>
+                        <p class="subtitle" data-i18n="ai_analyst_subtitle">اطرح أي سؤال حول أرباحك، مرتجعاتك، ومصاريفك الإعلانية</p>
+                    </div>
+                </div>
+
+                <div class="ai-chat-box">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message ai">
+                            <div class="message-sender"><i class="fa-solid fa-robot"></i> ProfitPilot AI (خبير مالي معتمد)</div>
+                            <div class="message-bubble">
+                                مرحباً بك كريم! أنا مساعدك المالي الذكي. لقد قمت بفحص بيانات متجرك بالكامل:
+                                <br>• حققت حتى الآن <strong>3,035 درهم</strong> كمبيعات مستلمة عبر 13 طلبية بنسبة تسليم ممتازة 86.7%.
+                                <br>• صافي الربح الحقيقي بعد اقتطاع السلعة، الشحن، والإعلانات بلغ <strong>+434 درهم</strong>.
+                                <br>• لديك <strong>2,438 درهم</strong> أموال محصلة معلقة قيد التحويل لدى شركات التوصيل.
+                                <br><br>اسألني عن أي تفاصيل حول أرباحك أو خطط تحسين الهامش الربحي!
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-bar">
+                        <input type="text" id="ai-chat-input" data-i18n-ph="ph_ai_chat" placeholder="اكتب سؤالك المالي هنا..." onkeypress="handleChatKey(event)">
+                        <button class="btn btn-primary" onclick="sendAiMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 8: AI Catalog Copilot -->
+            <section id="tab-catalog-ai" class="content-tab">
+                <div class="section-header">
+                    <div>
+                        <h1 data-i18n="ai_copilot_title">كاتب إعلانات وصفحات هبوط المنتجات</h1>
+                        <p class="subtitle" data-i18n="ai_copilot_subtitle">توليد عناوين جذابة ونصوص تسويقية مقنعة بالدارجة والفصحى والفرنسية</p>
+                    </div>
+                </div>
+
+                <div class="catalog-generator-form">
+                    <div class="form-group">
+                        <label data-i18n="lbl_product_base_name">اسم المنتج الأساسي:</label>
+                        <input type="text" id="cat-title-input" value="خلاط محمول ذكي قابل للشحن (Smart USB Blender)">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="lbl_product_category">التصنيف:</label>
+                        <input type="text" id="cat-category-input" value="أدوات منزلية">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="lbl_product_features">المميزات البارزة (مفصولة بفاصلة):</label>
+                        <input type="text" id="cat-features-input" value="شفرات فولاذية مضادة للصدأ، بطارية تدوم 15 يوم، شحن USB سريع">
+                    </div>
+                    <button class="btn btn-primary" onclick="generateCatalogCopy()"><i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="btn_generate_copy">توليد المحتوى التسويقي</span></button>
+
+                    <div id="catalog-result-box" class="catalog-result-box" style="margin-top: 24px;">
+                        <h3 data-i18n="lbl_suggested_title">العنوان التسويقي المقترح:</h3>
+                        <p id="res-optimized-title" class="highlight-text">خلاط محمول ذكي قابل للشحن الأصلي الممتاز — الحل المثالي اليومي</p>
+
+                        <h3 data-i18n="lbl_persuasive_copy">الوصف الإعلاني المقنع:</h3>
+                        <p id="res-description">اكتشف الخلاط المحمول الذكي المصمم خصيصاً ليمنحك تجربة استثنائية وأداءً عالي الدقة في تحضير العصائر والسموذي في أي مكان. بطارية ليثيوم قوية وشفرات فولاذية حادة تدوم طويلاً.</p>
+
+                        <h3 data-i18n="lbl_bullet_points">نقاط البيع الجذابة (Bullet Points):</h3>
+                        <ul id="res-bullets">
+                            <li>شفرات من الفولاذ المقاوم للصدأ تخلط الثلج والفواكه في ثوانٍ</li>
+                            <li>بطارية قابلة للشحن تدوم حتى 15 يوماً من الاستخدام اليومي</li>
+                            <li>توصيل سريع لباب المنزل مع الدفع عند الاستلام وضمان استبدال حقيقي 7 أيام</li>
+                        </ul>
+
+                        <h3 data-i18n="lbl_store_faq">الأسئلة الشائعة (FAQ) للمتجر:</h3>
+                        <div id="res-faq">
+                            <p><strong>س: كيف يتم الدفع والتوصيل؟</strong><br>ج: التوصيل يتم مباشرة حتى باب منزلك، ويكون الدفع نقداً عند استلامك للمنتج ومعاينته.</p>
+                            <p><strong>س: هل يتوفر المنتج على ضمان؟</strong><br>ج: نعم، ضمان استبدال فوري لمدة 7 أيام في حال وجود أي عيب مصنعي.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 9: Store Integrations (WooCommerce & Shopify Webhooks) -->
+            <section id="tab-integrations" class="content-tab">
+                <div class="section-header">
+                    <div>
+                        <h1><i class="fa-solid fa-plug-circle-bolt" style="color:#10b981;"></i> <span data-i18n="integrations_title">الربط الآلي مع المتاجر (WooCommerce & Shopify)</span></h1>
+                        <p class="subtitle" data-i18n="integrations_subtitle">استقبال الطلبيات ومزامنة بيانات العملاء والمبيعات تلقائياً وفورياً فور تسجيلها في متجرك</p>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-secondary" onclick="loadIntegrationLogs()"><i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="btn_refresh_logs">تحديث سجل الربط</span></button>
+                    </div>
+                </div>
+
+                <!-- Integration Cards Grid -->
+                <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); margin-bottom: 24px;">
+                    <!-- 1. WooCommerce Integration Card -->
+                    <div class="kpi-card" style="flex-direction: column; align-items: stretch; border: 1px solid #7c3aed44; background: linear-gradient(180deg, rgba(124, 58, 237, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <i class="fa-brands fa-wordpress" style="font-size:2rem; color:#a855f7;"></i>
+                                <div>
+                                    <h3 style="margin:0; font-size:1.1rem;">WooCommerce Webhook</h3>
+                                    <small style="color:#94a3b8;" data-i18n="wc_compat_hint">متوافق مع جميع قوالب ووردبريس و CartFlows</small>
+                                </div>
+                            </div>
+                            <span class="badge delivered"><i class="fa-solid fa-circle-dot"></i> <span data-i18n="badge_live_ready">جاهز للاستقبال اللحظي</span></span>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 10px;">
+                            <label style="font-size:0.8rem; color:#cbd5e1;" data-i18n="lbl_webhook_url">رابط Webhook الخاص بمتجرك (Delivery URL):</label>
+                            <div style="display:flex; gap:6px;">
+                                <input type="text" id="wc-webhook-url" value="http://localhost:8000/api/v1/integrations/woocommerce/webhook?store_id=1" readonly style="font-size:0.75rem; background:rgba(0,0,0,0.3); font-family:monospace;">
+                                <button class="btn btn-secondary" onclick="copyWebhook('wc-webhook-url')" style="padding:6px 12px;" title="نسخ الرابط"><i class="fa-solid fa-copy"></i></button>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(0,0,0,0.25); border-radius: 8px; padding: 10px; font-size: 0.8rem; margin-bottom: 14px; border: 1px dashed rgba(255,255,255,0.1);">
+                            <strong data-i18n="wc_steps_title">خطوات التفعيل في WordPress:</strong>
+                            <ol style="margin: 6px 0 0 18px; padding: 0; line-height: 1.5; color: #94a3b8;">
+                                <li data-i18n="wc_step_1">اذهب إلى: <code>WooCommerce &gt; الإعدادات &gt; متقدم &gt; Webhooks</code>.</li>
+                                <li data-i18n="wc_step_2">اضغط <strong>إضافة خطاف ويب</strong> والصق الرابط أعلاه في خانة <em>Delivery URL</em>.</li>
+                                <li data-i18n="wc_step_3">اختر الموضوع: <strong>تم إنشاء الطلب (Order created)</strong> والحالة: <strong>نشط (Active)</strong> ثم احفظ.</li>
+                            </ol>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="simulateSync('woocommerce')">
+                            <i class="fa-solid fa-bolt"></i> <span data-i18n="btn_test_wc">إرسال طلب تجريبي فوري من WooCommerce</span>
+                        </button>
+                    </div>
+
+                    <!-- 2. Shopify Integration Card -->
+                    <div class="kpi-card" style="flex-direction: column; align-items: stretch; border: 1px solid #10b98144; background: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <i class="fa-brands fa-shopify" style="font-size:2rem; color:#34d399;"></i>
+                                <div>
+                                    <h3 style="margin:0; font-size:1.1rem;">Shopify Webhook</h3>
+                                    <small style="color:#94a3b8;" data-i18n="shopify_compat_hint">مزامنة مباشرة مع متاجر شوبيفاي ونماذج COD</small>
+                                </div>
+                            </div>
+                            <span class="badge delivered"><i class="fa-solid fa-circle-dot"></i> <span data-i18n="badge_live_ready">جاهز للاستقبال اللحظي</span></span>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 10px;">
+                            <label style="font-size:0.8rem; color:#cbd5e1;" data-i18n="lbl_shopify_url">رابط Webhook الخاص بمتجرك (Shopify Webhook URL):</label>
+                            <div style="display:flex; gap:6px;">
+                                <input type="text" id="shopify-webhook-url" value="http://localhost:8000/api/v1/integrations/shopify/webhook?store_id=1" readonly style="font-size:0.75rem; background:rgba(0,0,0,0.3); font-family:monospace;">
+                                <button class="btn btn-secondary" onclick="copyWebhook('shopify-webhook-url')" style="padding:6px 12px;" title="نسخ الرابط"><i class="fa-solid fa-copy"></i></button>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(0,0,0,0.25); border-radius: 8px; padding: 10px; font-size: 0.8rem; margin-bottom: 14px; border: 1px dashed rgba(255,255,255,0.1);">
+                            <strong data-i18n="shopify_steps_title">خطوات التفعيل في Shopify:</strong>
+                            <ol style="margin: 6px 0 0 18px; padding: 0; line-height: 1.5; color: #94a3b8;">
+                                <li data-i18n="shopify_step_1">اذهب إلى: <code>Shopify Admin &gt; Settings &gt; Notifications</code>.</li>
+                                <li data-i18n="shopify_step_2">انزل للأسفل إلى قسم <strong>Webhooks</strong> واضغط <strong>Create Webhook</strong>.</li>
+                                <li data-i18n="shopify_step_3">اختر الحدث: <strong>Order creation</strong> بصيغة JSON والصق الرابط أعلاه ثم احفظ.</li>
+                            </ol>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="simulateSync('shopify')" style="background-color: #059669;">
+                            <i class="fa-solid fa-bolt"></i> <span data-i18n="btn_test_shopify">إرسال طلب تجريبي فوري من Shopify</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Synced Orders Table -->
+                <div style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
+                    <h2 style="font-size:1.15rem; font-weight:800;"><i class="fa-solid fa-list-check"></i> <span data-i18n="synced_orders_heading">سجل الطلبيات المستقبلة تلقائياً من المتاجر الخارجية</span></h2>
+                    <span id="synced-orders-badge" class="badge delivered" style="font-size:0.8rem;">0 طلبات متزامنة</span>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="integrations-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="th_platform">المنصة</th>
+                                <th data-i18n="th_internal_order">رقم الطلب في المنصة</th>
+                                <th data-i18n="th_external_order">رقم الطلب في المتجر الخارجي</th>
+                                <th data-i18n="th_customer_city">اسم العميل والمدينة</th>
+                                <th data-i18n="th_amount_cod">مبلغ الطلب (COD)</th>
+                                <th data-i18n="th_sync_time">وقت الاستقبال</th>
+                                <th data-i18n="th_sync_status">حالة المزامنة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="integrations-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- 1. Modal: إضافة طلب جديد (New Order Modal) -->
+    <div id="modal-new-order" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-cart-plus"></i> <span data-i18n="modal_new_order_title">إضافة طلب جديد (Create Order)</span></h2>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button type="button" class="btn-sample-fill" onclick="fillSampleOrderData()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="btn_fill_sample">ملء بيانات تجريبية (Sample Data)</span>
+                    </button>
+                    <button class="modal-close" onclick="closeModal('modal-new-order')"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_cust_name">اسم العميل الكامل:</label>
+                        <input type="text" id="order-cust-name" value="" data-i18n-ph="ph_cust_name" placeholder="مثال: يوسف المنصوري / Karim Alami">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_cust_phone">رقم الهاتف (WhatsApp):</label>
+                        <input type="text" id="order-cust-phone" value="" data-i18n-ph="ph_cust_phone" placeholder="مثال: +212 661-123456">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_cust_city">المدينة (اختر أو اكتب):</label>
+                        <input type="text" id="order-cust-city" list="cities-list" value="" data-i18n-ph="ph_cust_city" placeholder="اختر أو اكتب المدينة... (الدار البيضاء، مراكش، الرباط...)" oninput="onCityChanged()">
+                        <datalist id="cities-list">
+                            <option value="الدار البيضاء (Casablanca)">
+                            <option value="الرباط (Rabat)">
+                            <option value="مراكش (Marrakech)">
+                            <option value="طنجة (Tanger)">
+                            <option value="فاس (Fes)">
+                            <option value="أكادير (Agadir)">
+                            <option value="وجدة (Oujda)">
+                            <option value="القنيطرة (Kenitra)">
+                            <option value="تطوان (Tetouan)">
+                            <option value="العيون (Laayoune)">
+                            <option value="الداخلة (Dakhla)">
+                        </datalist>
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_cust_address">العنوان بالتفصيل:</label>
+                        <input type="text" id="order-cust-address" value="" data-i18n-ph="ph_cust_address" placeholder="مثال: شارع أنفا، إقامة الياسمين رقم 14">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_order_product">المنتج المطلوب:</label>
+                        <select id="order-prod-select" onchange="calculateOrderTotal()">
+                            <option value="1" data-price="249.00" data-cost="65.00" selected>خلاط محمول ذكي قابل للشحن (249 MAD)</option>
+                            <option value="2" data-price="199.00" data-cost="48.00">وسادة طبية لدعم الظهر والفقرات (199 MAD)</option>
+                            <option value="3" data-price="299.00" data-cost="85.00">فرشاة تمليس الشعر الحرارية (299 MAD)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="width: 100px;">
+                        <label data-i18n="lbl_order_qty">الكمية:</label>
+                        <input type="number" id="order-qty" value="1" min="1" onchange="calculateOrderTotal()">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_carrier_company">شركة التوصيل المقترحة:</label>
+                        <select id="order-carrier-select" onchange="onCarrierOrCityChanged()">
+                            <option value="1" selected>Cathedis Express</option>
+                            <option value="2">Ozon Delivery</option>
+                            <option value="3">Amana Express</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="width: 150px;">
+                        <label data-i18n="lbl_carrier_fee">رسوم التوصيل (المدينة):</label>
+                        <input type="number" id="order-carrier-fee" value="25.00" oninput="calculateOrderTotal()">
+                    </div>
+                    <div class="form-group" style="width: 130px;">
+                        <label data-i18n="lbl_shipping_charged">الشحن على العميل:</label>
+                        <input type="text" id="order-shipping-charged" value="0.00 (مجاني)" readonly>
+                    </div>
+                </div>
+
+                <div class="order-summary-box">
+                    <div class="summary-line">
+                        <span data-i18n="lbl_total_cod">المبلغ الإجمالي للتحصيل عند الاستلام (COD):</span>
+                        <strong id="modal-order-total" class="highlight-val">249.00 MAD</strong>
+                    </div>
+                    <div class="summary-line sub">
+                        <span data-i18n="lbl_expected_profit">صافي الربح المتوقع عند التسليم الناجح:</span>
+                        <span id="modal-order-expected-profit" style="color:#34d399; font-weight:bold;">+154.00 MAD</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modal-new-order')" data-i18n="btn_cancel">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitNewOrder()"><i class="fa-solid fa-check"></i> <span data-i18n="btn_save_order">حفظ الطلب وتأكيد الحجز</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Modal: تفاصيل ومطابقة تسوية شركة الشحن (Reconciliation Audit Modal) -->
+    <div id="modal-reconciliation" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-scale-balanced"></i> <span data-i18n="modal_recon_title">تسوية ومطابقة الحساب البنكي لشركة الشحن (COD Audit)</span></h2>
+                <button class="modal-close" onclick="closeModal('modal-reconciliation')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="carrier-recon-summary">
+                    <h3 id="recon-carrier-name">Cathedis Express</h3>
+                    <p class="subtitle" data-i18n="recon_audit_subtitle">التدقيق المالي الآلي: مطابقة الكشف البنكي مع مبالغ الزبائن المسلمة</p>
+                </div>
+
+                <div class="audit-breakdown-box">
+                    <div class="audit-row">
+                        <span data-i18n="lbl_recon_collected">إجمالي المبالغ المحصلة من الزبائن:</span>
+                        <strong id="recon-collected-val">+2,438.00 MAD</strong>
+                    </div>
+                    <div class="audit-row minus">
+                        <span data-i18n="lbl_recon_shipping_fee">رسوم التوصيل المقتطعة:</span>
+                        <span id="recon-shipping-deduct">-280.00 MAD</span>
+                    </div>
+                    <div class="audit-row minus">
+                        <span data-i18n="lbl_recon_return_fee">رسوم شحن المرتجعات (RTO):</span>
+                        <span id="recon-return-deduct">-60.00 MAD</span>
+                    </div>
+                    <div class="audit-divider"></div>
+                    <div class="audit-row total">
+                        <span data-i18n="lbl_recon_expected_payout">صافي التحويل البنكي المتوقع:</span>
+                        <strong class="highlight-val" id="recon-expected-payout-val">2,098.00 MAD</strong>
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-top: 14px;">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_recon_bank">البنك المستلم للتحويل:</label>
+                        <select id="recon-bank-name">
+                            <option value="CIH Bank" selected>CIH Bank (بنك السياش)</option>
+                            <option value="Attijariwafa bank">Attijariwafa bank (التجاري وفا بنك)</option>
+                            <option value="Banque Populaire">Banque Populaire (البنك الشعبي)</option>
+                            <option value="BMCE Bank of Africa">BMCE Bank of Africa</option>
+                            <option value="Al Barid Bank">Al Barid Bank (بريد بنك)</option>
+                            <option value="Al Rajhi Bank">Al Rajhi Bank (مصرف الراجحي)</option>
+                        </select>
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_recon_ref">رقم مرجع التحويل (Avis de Virement):</label>
+                        <input type="text" id="recon-bank-ref" value="VIR-20261021-9874">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 10px;">
+                    <label data-i18n="lbl_recon_actual">المبلغ الفعلي المستلم في حسابك البنكي:</label>
+                    <input type="number" id="recon-actual-received" value="2098.00" oninput="calculateDiscrepancy()">
+                </div>
+
+                <div id="recon-discrepancy-box" class="discrepancy-box matched">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div>
+                        <strong data-i18n="recon_matched_title">المطابقة تامة بنسبة 100% (Zero Discrepancy)</strong>
+                        <p data-i18n="recon_matched_desc">المبلغ المحول يطابق بدقة صافي مستحقات متجرك بعد اقتطاع رسوم الشحن والمرتجعات العادلة.</p>
+                    </div>
+                </div>
+
+                <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 10px 14px; margin-top: 12px; font-size: 0.8rem; color: #93c5fd;">
+                    <i class="fa-solid fa-circle-info"></i> <strong data-i18n="recon_how_title">كيف يعلم التطبيق بالمطابقة دون ربط مباشر بالبنك؟</strong><br>
+                    <span data-i18n="recon_how_desc">يقوم ProfitPilot AI بالتدقيق الحسابي المستقل: يجمع ما دفعه الزبائن في الطلبات المسلمة ويطرح رسوم التوصيل والمرتجعات الرسمية، ثم يقارن الناتج بالمبلغ الذي وصل حسابك البنكي، ليكشف لك فوراً أي اقتطاع غير مبرر أو خطأ في الفواتير!</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modal-reconciliation')" data-i18n="btn_close">إغلاق</button>
+                <button class="btn btn-primary" onclick="confirmReconciliation()"><i class="fa-solid fa-file-signature"></i> <span data-i18n="btn_confirm_recon">اعتماد التسوية وأرشفة الفاتورة</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Modal: إضافة مصاريف إعلانية (Add Marketing Spend Modal) -->
+    <div id="modal-add-spend" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-bullhorn"></i> <span data-i18n="modal_ad_spend_title">تسجيل مصاريف إعلانية (Add Ad Spend)</span></h2>
+                <button class="modal-close" onclick="closeModal('modal-add-spend')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_ad_platform">المنصة الإعلانية:</label>
+                        <select id="spend-platform">
+                            <option value="meta" selected>Meta Ads (Facebook & Instagram)</option>
+                            <option value="tiktok">TikTok Ads</option>
+                            <option value="google">Google Ads</option>
+                            <option value="snapchat">Snapchat Ads</option>
+                        </select>
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_ad_amount">المبلغ المنفق (Spend):</label>
+                        <input type="number" id="spend-amount" value="350.00">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="lbl_campaign_name">اسم الحملة الإعلانية:</label>
+                    <input type="text" id="spend-campaign-name" value="[Meta] الخلاط الذكي المحمول — حملة المبيعات والتحويلات">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_campaign_orders">عدد الطلبات المسجلة في الإعلان:</label>
+                        <input type="number" id="spend-conversions" value="8">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_campaign_date">تاريخ الإنفاق:</label>
+                        <input type="date" id="spend-date" value="2026-10-21">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modal-add-spend')" data-i18n="btn_cancel">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitAdSpend()"><i class="fa-solid fa-floppy-disk"></i> <span data-i18n="btn_save_spend">حفظ وربط مع العائد ROAS</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Modal: تعديل أسعار الشحن حسب المدن (Carrier City Rates Modal) -->
+    <div id="modal-city-rates" class="modal-overlay">
+        <div class="modal-card" style="max-width: 680px;">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-map-location-dot"></i> <span data-i18n="modal_city_rates_title">تسعيرة التوصيل حسب المدن (City Shipping Rates)</span></h2>
+                <button class="modal-close" onclick="closeModal('modal-city-rates')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row" style="margin-bottom: 14px;">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_select_carrier">اختر شركة الشحن:</label>
+                        <select id="rates-carrier-select" onchange="loadCarrierCityRates(this.value)">
+                            <option value="1" selected>Cathedis Express</option>
+                            <option value="2">Ozon Delivery</option>
+                            <option value="3">Amana Express</option>
+                        </select>
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_default_shipping_rate">سعر التوصيل الافتراضي العام (MAD):</label>
+                        <input type="number" id="rates-default-shipping" value="35.00">
+                    </div>
+                </div>
+
+                <p style="font-size:0.82rem; color:#94a3b8; margin-bottom: 10px;" data-i18n="city_rates_info">
+                    <i class="fa-solid fa-circle-info"></i> يمكنك تخصيص سعر توصيل خاص بكل مدينة. عند إنشاء أي طلبية أو استقبالها من ووكومرس/شوبيفاي، سيتم تطبيق سعر المدينة تلقائياً لحساب صافي الربح الدقيق!
+                </p>
+
+                <div class="table-container" style="max-height: 290px; overflow-y: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="th_city_name">المدينة / الإقليم</th>
+                                <th data-i18n="th_region">المنطقة الجغرافية</th>
+                                <th data-i18n="th_actual_shipping_rate">سعر التوصيل الفعلي (MAD)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="city-rates-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modal-city-rates')" data-i18n="btn_cancel">إلغاء</button>
+                <button class="btn btn-primary" onclick="saveCityRates()"><i class="fa-solid fa-floppy-disk"></i> <span data-i18n="btn_save_city_rates">حفظ أسعار المدن وتطبيقها</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Modal: تعديل بيانات الحساب والمتجر (Profile Settings Modal) -->
+    <div id="modal-profile-settings" class="modal-overlay">
+        <div class="modal-card" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-user-gear"></i> <span data-i18n="modal_profile_title">إعدادات الحساب والمتجر (Profile & Store Settings)</span></h2>
+                <button class="modal-close" onclick="closeModal('modal-profile-settings')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_profile_owner_name">اسم التاجر / صاحب الحساب:</label>
+                        <input type="text" id="profile-owner-name" value="كريم العلمي">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_profile_store_name">اسم المتجر الإلكتروني:</label>
+                        <input type="text" id="profile-store-name" value="متجر الأطلس للتجارة">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_profile_phone">رقم الهاتف (WhatsApp):</label>
+                        <input type="text" id="profile-phone" value="+212 661-123456">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_profile_email">البريد الإلكتروني للعمل:</label>
+                        <input type="email" id="profile-email" value="demo@profitpilot.ai">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_profile_base_city">المدينة الرئيسية / مقر العمل:</label>
+                        <input type="text" id="profile-base-city" value="الدار البيضاء (Casablanca)">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_profile_currency">العملة الأساسية للمتجر:</label>
+                        <select id="profile-currency">
+                            <option value="MAD" selected>MAD — الدرهم المغربي</option>
+                            <option value="SAR">SAR — الريال السعودي</option>
+                            <option value="USD">USD — الدولار الأمريكي ($)</option>
+                            <option value="EUR">EUR — اليورو الأوروبي (€)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_profile_bank_name">البنك المستلم لمستحقات التوصيل:</label>
+                        <select id="profile-bank-name">
+                            <option value="CIH Bank" selected>CIH Bank (بنك السياش)</option>
+                            <option value="Attijariwafa bank">Attijariwafa bank (التجاري وفا بنك)</option>
+                            <option value="Banque Populaire">Banque Populaire (البنك الشعبي)</option>
+                            <option value="BMCE Bank of Africa">BMCE Bank of Africa</option>
+                            <option value="Al Barid Bank">Al Barid Bank (بريد بنك)</option>
+                            <option value="Al Rajhi Bank">Al Rajhi Bank (مصرف الراجحي)</option>
+                        </select>
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_profile_bank_rib">رقم الحساب البنكي (RIB / IBAN):</label>
+                        <input type="text" id="profile-bank-rib" value="230 780 45678901234567 89">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content: space-between;">
+                <button class="btn btn-outline" onclick="logoutUser()" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4);" data-i18n="btn_logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> تسجيل الخروج وتبديل الحساب</button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-secondary" onclick="closeModal('modal-profile-settings')" data-i18n="btn_cancel">إلغاء</button>
+                    <button class="btn btn-primary" onclick="saveProfileSettings()"><i class="fa-solid fa-floppy-disk"></i> <span data-i18n="btn_save_profile">حفظ البيانات وتحديث المتجر</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Modal: دليل الترحيب والإعداد الأولي وحساب الدخول (First-Time Onboarding & Auth Wizard) -->
+    <div id="modal-onboarding" class="modal-overlay">
+        <div class="modal-card onboarding-card">
+            <div class="onboarding-welcome-header">
+                <img src="assets/logo-icon.svg" alt="ProfitPilot AI Logo">
+                <h2 data-i18n="onboard_welcome_title">مرحباً بك في ProfitPilot AI 🚀</h2>
+                <p data-i18n="onboard_welcome_subtitle">المنصة الذكية الأولى لإدارة وتدقيق أرباح التجارة الإلكترونية والدفع عند الاستلام. لنبدأ بإعداد متجرك أو المزامنة مع أجهزتك!</p>
+            </div>
+
+            <!-- Auth Mode Switcher Tabs -->
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab-btn active" id="btn-auth-mode-register" onclick="switchAuthMode('register')">
+                    <i class="fa-solid fa-user-plus"></i> <span data-i18n="tab_auth_register">إنشاء متجر وحساب جديد</span>
+                </button>
+                <button type="button" class="auth-tab-btn" id="btn-auth-mode-login" onclick="switchAuthMode('login')">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> <span data-i18n="tab_auth_login">تسجيل الدخول (مزامنة هاتف/جهاز آخر)</span>
+                </button>
+            </div>
+
+            <!-- Pane 1: Register New Store & User -->
+            <div id="pane-auth-register">
+                <div class="modal-body" style="padding: 12px 20px;">
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label data-i18n="lbl_profile_owner_name">اسمك الكريم:</label>
+                            <input type="text" id="onboard-owner-name" value="كريم العلمي" placeholder="مثال: كريم العلمي">
+                        </div>
+                        <div class="form-group flex-1">
+                            <label data-i18n="lbl_profile_store_name">اسم متجرك الإلكتروني:</label>
+                            <input type="text" id="onboard-store-name" value="متجر الأطلس للتجارة" placeholder="مثال: متجر الأطلس">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label data-i18n="lbl_auth_email">البريد الإلكتروني (لحفظ الحساب والدخول المتعدد):</label>
+                            <input type="email" id="onboard-email" value="karim.alami@profitpilot.ai" placeholder="store@example.com">
+                        </div>
+                        <div class="form-group flex-1">
+                            <label data-i18n="lbl_auth_password">كلمة المرور (للدخول من أي هاتف آخر):</label>
+                            <input type="password" id="onboard-password" value="password123" placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label data-i18n="lbl_profile_base_city">المدينة الرئيسية لمتجرك:</label>
+                            <input type="text" id="onboard-base-city" value="الدار البيضاء (Casablanca)" placeholder="مثال: الدار البيضاء، مراكش، الرياض...">
+                        </div>
+                        <div class="form-group flex-1">
+                            <label data-i18n="lbl_profile_currency">العملة الأساسية لحساب أرباحك:</label>
+                            <select id="onboard-currency">
+                                <option value="MAD" selected>MAD (الدرهم المغربي)</option>
+                                <option value="SAR">SAR (الريال السعودي)</option>
+                                <option value="USD">USD ($ - الدولار الأمريكي)</option>
+                                <option value="EUR">EUR (€ - اليورو)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label data-i18n="lbl_profile_phone">رقم هاتفك (WhatsApp):</label>
+                            <input type="text" id="onboard-phone" value="+212 661-123456" placeholder="+212 600-000000">
+                        </div>
+                        <div class="form-group flex-1">
+                            <label data-i18n="lbl_profile_bank_name">البنك المستلم لأموال التوصيل:</label>
+                            <select id="onboard-bank">
+                                <option value="CIH Bank" selected>CIH Bank (بنك السياش)</option>
+                                <option value="Attijariwafa bank">Attijariwafa bank (التجاري)</option>
+                                <option value="Banque Populaire">Banque Populaire (الشعبي)</option>
+                                <option value="Al Barid Bank">Al Barid Bank (بريد بنك)</option>
+                                <option value="Al Rajhi Bank">Al Rajhi Bank (الراجحي)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="justify-content: center; padding: 16px;">
+                    <button class="btn btn-primary" onclick="completeOnboardingRegister()" style="padding: 10px 28px; font-size: 1rem; width: 100%;">
+                        <i class="fa-solid fa-rocket"></i> <span data-i18n="btn_complete_onboarding">إنشاء الحساب ومزامنة متجرك الآن</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pane 2: Login Existing User from Another Phone / Device -->
+            <div id="pane-auth-login" style="display: none;">
+                <div class="modal-body" style="padding: 16px 20px;">
+                    <div class="auth-info-banner">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <div>
+                            <strong data-i18n="banner_login_info_title">مزامنة سحابية متقدمة عبر جميع أجهزتك:</strong>
+                            <p style="margin: 4px 0 0 0;" data-i18n="banner_login_info_desc">إذا كنت قد أنشأت حساباً مسبقاً على هاتفك أو حاسوبك، قم بتسجيل الدخول هنا بنفس البريد وكلمة المرور لمزامنة جميع أرباحك، طلباتك، ومطابقات الشحن فوراً على هذا الجهاز.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label data-i18n="lbl_auth_email">البريد الإلكتروني المسجل:</label>
+                        <input type="email" id="login-email" value="demo@profitpilot.ai" placeholder="store@example.com">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label data-i18n="lbl_auth_password">كلمة المرور:</label>
+                        <input type="password" id="login-password" value="password123" placeholder="••••••••">
+                    </div>
+                </div>
+                <div class="modal-footer" style="justify-content: center; padding: 16px;">
+                    <button class="btn btn-primary" onclick="handleLoginSubmit()" style="padding: 10px 28px; font-size: 1rem; width: 100%;">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> <span data-i18n="btn_login_sync">تسجيل الدخول ومزامنة بيانات المتجر</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- 7. Modal: إضافة منتج جديد (Add New Product Modal) -->
+    <div id="modal-new-product" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-box"></i> <span data-i18n="modal_add_product_title">إضافة منتج جديد للكتالوج</span></h2>
+                <button class="modal-close" onclick="closeModal('modal-new-product')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_prod_sku">رمز المنتج (SKU):</label>
+                        <input type="text" id="new-prod-sku" placeholder="مثال: PRD-ARGAN-01" required>
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_prod_title">اسم المنتج:</label>
+                        <input type="text" id="new-prod-title" placeholder="مثال: سيروم زيت الأركان الطبيعي" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_prod_category">التصنيف (Category):</label>
+                        <input type="text" id="new-prod-category" placeholder="مثال: مستحضرات تجميل" value="عام">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_prod_stock">الكمية المتوفرة بالمستودع:</label>
+                        <input type="number" id="new-prod-stock" value="50" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_prod_purchase_cost">سعر الشراء من المورد (Cost):</label>
+                        <input type="number" id="new-prod-purchase-cost" placeholder="45.00" step="0.5" required>
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_prod_selling_price">سعر البيع للزبون (Selling Price):</label>
+                        <input type="number" id="new-prod-selling-price" placeholder="199.00" step="0.5" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_prod_packaging_cost">تكلفة التغليف للقطعة:</label>
+                        <input type="number" id="new-prod-packaging-cost" value="5.00" step="0.5">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label data-i18n="lbl_prod_reorder_threshold">حد إعادة الطلب (Alert Threshold):</label>
+                        <input type="number" id="new-prod-reorder" value="10" min="1">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modal-new-product')" data-i18n="btn_cancel">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitNewProduct()"><i class="fa-solid fa-check"></i> <span data-i18n="btn_save_product">حفظ المنتج</span></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="demo_data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
